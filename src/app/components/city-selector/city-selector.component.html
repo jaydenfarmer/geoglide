@@ -1,0 +1,6 @@
+<select (change)="selectCityFromEvent($event)">
+  <option value="">Choose a city...</option>
+  @for (city of cities; track city.id) {
+  <option [value]="city.timezone">{{ city.name }}</option>
+  }
+</select>
