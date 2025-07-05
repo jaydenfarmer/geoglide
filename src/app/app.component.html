@@ -1,26 +1,34 @@
-<app-city-sidebar></app-city-sidebar>
-<app-globe
-  [lat]="selectedCity?.lat || 0"
-  [lon]="selectedCity?.lng || 0"
-  [selectedCityId]="selectedCity?.id || null"
-  (citySelected)="onGlobeCitySelected($event)"
-></app-globe>
-<div class="app-header">
-  <app-city-selector
-    (citySelected)="onCitySelected($event)"
-  ></app-city-selector>
+<app-city-sidebar
+  [selectedCity]="selectedCity"
+  (citySelected)="onCitySelected($event)"
+  (displayedCitiesChanged)="onDisplayedCitiesChanged($event)"
+>
+</app-city-sidebar>
 
-  <button
-    class="auto-rotate-toggle"
-    (click)="toggleAutoRotate()"
-    [class.active]="isAutoRotating"
-  >
-    {{ isAutoRotating ? "⏸️ Stop Auto-Rotate" : "🔄 Auto-Rotate" }}
-  </button>
+<div class="main-content">
+  <div class="app-header">
+    <h2 class="app-title">🌍 GeoGlide</h2>
+    @if (selectedCity) {
+    <div class="selected-city-info">
+      <span class="selected-city">{{ selectedCity.name }}</span>
+      <span class="selected-timezone">{{
+        getCityCountry(selectedCity.timezone)
+      }}</span>
+    </div>
+    }
+  </div>
+
+  <app-globe
+    [lat]="selectedCity?.lat || 0"
+    [lon]="selectedCity?.lng || 0"
+    [selectedCityId]="selectedCity?.name || null"
+    [displayedCities]="displayedCities"
+    (citySelected)="onGlobeCitySelected($event)"
+  ></app-globe>
+
+  @if (selectedCity) {
+  <app-time-display [timezone]="selectedCity.timezone"></app-time-display>
+  }
 </div>
-
-@if (selectedCity) {
-<app-time-display [timezone]="selectedCity.timezone"></app-time-display>
-}
 
 <router-outlet />
