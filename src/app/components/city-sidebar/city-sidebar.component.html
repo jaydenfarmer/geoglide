@@ -1,1 +1,67 @@
-<p>city-sidebar works!</p>
+<div class="city-sidebar">
+  <div class="sidebar-header">
+    <h3>🌍 Cities</h3>
+    <span class="city-count">{{ displayedCities.length }}</span>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <div class="search-input-wrapper">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search cities..."
+        class="search-input"
+      />
+      <button *ngIf="searchTerm" (click)="clearSearch()" class="clear-search">
+        ✕
+      </button>
+    </div>
+
+    <!-- Search Results Dropdown -->
+    <div *ngIf="searchResults.length > 0" class="search-results">
+      <div
+        *ngFor="let city of searchResults; trackBy: trackByCity"
+        (click)="addCityToSidebar(city)"
+        class="search-result-item"
+      >
+        <span class="city-name">{{ city.name }}</span>
+        <span class="city-timezone">{{ getCityCountry(city.timezone) }}</span>
+        <button class="add-button">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- City List -->
+  <div class="city-list">
+    <div
+      *ngFor="let city of displayedCities; trackBy: trackByCity"
+      (click)="selectCity(city)"
+      class="city-item"
+      [class.selected]="selectedCity?.name === city.name"
+      [class.major-city]="isMajorCity(city)"
+    >
+      <div class="city-info">
+        <span class="city-name">{{ city.name }}</span>
+        <span class="city-timezone">{{ getCityCountry(city.timezone) }}</span>
+      </div>
+
+      <div class="city-actions">
+        <span class="city-flag">{{ getCityFlag(city.name) }}</span>
+        <button
+          *ngIf="!isMajorCity(city)"
+          (click)="removeCityFromSidebar(city); $event.stopPropagation()"
+          class="remove-button"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="displayedCities.length === 0" class="empty-state">
+    <p>🔍 Search for cities to add them here</p>
+  </div>
+</div>
