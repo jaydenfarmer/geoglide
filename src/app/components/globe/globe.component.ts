@@ -3,7 +3,6 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
-import { CITIES } from '../../models/city-list';
 import { City } from '../../models/city.model';
 
 @Component({
@@ -17,6 +16,7 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() lat: number = 0;
   @Input() lon: number = 0;
   @Input() selectedCityId: string | null = null;
+  @Input() displayedCities: City[] = [];
   @Output() citySelected = new EventEmitter<City>();
 
   private root!: am5.Root;
@@ -86,10 +86,12 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
         // Get the specific city data for THIS bullet
         const cityData = dataItem.dataContext as any;
         
+        const isSelected = this.selectedCityId === cityData.name;
+        
         const bullet = am5.Bullet.new(this.root, {
           sprite: am5.Circle.new(this.root, {
             radius: 3,
-            fill: am5.color(0x00098e),
+            fill: am5.color(isSelected ? 0xe74c3c : 0x00098e),
             stroke: am5.color(0xffffff),
             strokeWidth: 1,
             cursorOverStyle: "pointer"
@@ -102,44 +104,18 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
         // Add click event with THIS city's data
         bullet.get("sprite")!.events.on("click", () => {
           // Find the city object by name
-          const city = CITIES.find(c => c.name === cityData.name);
+          const city = this.displayedCities.find(c => c.name === cityData.name);
           if (city) {
-            
-            // Update the internal lat/lon values
-            this.lat = city.lat;
-            this.lon = city.lng;
-            
-            // Call updateMarker directly
-            this.updateMarker();
-            
-            // Then emit the event
+            // Emit the event (this will update selectedCityId)
             this.citySelected.emit(city);
           }
         });
 
         return bullet;
       });
-
-
-      // Create selected city marker (larger)
-      this.pointSeries = this.chart.series.push(
-        am5map.MapPointSeries.new(this.root, {})
-      );
-
-      // Style the selected city marker
-      this.pointSeries.bullets.push(() => {
-        return am5.Bullet.new(this.root, {
-          sprite: am5.Circle.new(this.root, {
-            radius: 8,
-            fill: am5.color(0xe74c3c), // Red marker for selected city
-            stroke: am5.color(0xffffff),
-            strokeWidth: 2
-          })
-        });
-      });
-
-      // Add all cities as small pins
-      this.addAllCityPins();
+      
+      // Add initial city pins
+      this.updateCityPins();
 
       // Rotate animation
       this.chart.animate({
@@ -155,62 +131,92 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
     });
   }
 
-  private addAllCityPins() {
-    // Add all cities as small blue pins
-    const cityData = CITIES.map(city => ({
+  ngOnChanges(changes: SimpleChanges) {
+    // Update pins when displayed cities change
+    if (changes['displayedCities'] && this.chart) {
+      this.updateCityPins();
+    }
+    
+    // Update selection state when selectedCityId changes
+    if (changes['selectedCityId'] && this.chart) {
+      this.updateCityPins(); // Refresh pins to show new selection state
+    }
+
+    // Rotate to city when lat/lon changes
+    if ((changes['lat'] || changes['lon']) && this.chart) {
+      this.rotateToCity();
+    }
+  }
+
+  // New method to update pins based on displayed cities
+  private updateCityPins() {
+    if (!this.allCitiesPointSeries) return;
+
+    // Clear existing pins
+    this.allCitiesPointSeries.data.setAll([]);
+
+    // Add pins only for cities in sidebar
+    const cityData = this.displayedCities.map(city => ({
       geometry: { type: "Point", coordinates: [city.lng, city.lat] },
       name: city.name,
-      cityId: city.id
+      lat: city.lat,
+      lng: city.lng,
+      timezone: city.timezone
     }));
 
     this.allCitiesPointSeries.data.setAll(cityData);
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-  
-  if ((changes['lat'] || changes['lon']) && this.chart) {
-    this.updateMarker();
+  private rotateToCity() {
+    if (!this.chart || !this.selectedCityId) return;
+
+    const currentX = this.chart.get("rotationX") || 0;
+    const currentY = this.chart.get("rotationY") || 0;
+    
+    const targetX = -this.lon;
+    const targetY = -this.lat;
+
+    // Helper function for shortest rotation path
+    const getShortestPath = (from: number, to: number): number => {
+      const diff = ((to - from + 180) % 360) - 180;
+      return from + diff;
+    };
+
+    const finalX = getShortestPath(currentX, targetX);
+    const finalY = getShortestPath(currentY, targetY);
+
+    this.chart.animate({
+      key: "rotationX",
+      to: finalX,
+      duration: 1000,
+      easing: am5.ease.out(am5.ease.cubic)
+    });
+
+    this.chart.animate({
+      key: "rotationY",
+      to: finalY - 15, // allow room for details panel
+      duration: 1000,
+      easing: am5.ease.out(am5.ease.cubic)
+    });
   }
-}
-
-updateMarker() {
-  if (!this.pointSeries || !this.chart) {
-    return;
-  }
-
-  // Stop infinite rotation when a city is selected
-  this.chart.animate({
-    key: "rotationX",
-    to: -this.lon,
-    duration: 1000,
-    loops: 1 // Stop the infinite loop
-  });
-
-  // Clear previous selected marker
-  this.pointSeries.data.setAll([]);
-
-  // Add new selected marker (large red pin)
-  this.pointSeries.data.push({
-    geometry: { type: "Point", coordinates: [this.lon, this.lat] }
-  });
-
-  // Animate rotation to city
-  this.chart.animate({
-    key: "rotationX",
-    to: -this.lon,
-    duration: 1000,
-    easing: am5.ease.out(am5.ease.cubic)
-  });
-
-  this.chart.animate({
-    key: "rotationY",
-    to: -this.lat,
-    duration: 1000,
-    easing: am5.ease.out(am5.ease.cubic)
-  });
-}
 
   ngOnDestroy() {
     this.root?.dispose();
+  }
+
+  getCurrentGlobePosition(): { lat: number, lon: number } {
+    if (!this.chart) {
+      return { lat: 0, lon: 0 };
+    }
+
+    // Get current rotation from the chart
+    const currentRotationX = this.chart.get("rotationX") || 0;
+    const currentRotationY = this.chart.get("rotationY") || 0;
+
+    // Convert rotation back to coordinates (inverse of what we do in rotateToCity)
+    const currentLon = -currentRotationX;
+    const currentLat = -currentRotationY;
+
+    return { lat: currentLat, lon: currentLon };
   }
 }
