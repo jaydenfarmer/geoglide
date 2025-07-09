@@ -33,35 +33,24 @@
     </div>
   </div>
 
-  <!-- City List -->
-  <div class="city-list">
-    <div
-      *ngFor="let city of displayedCities; trackBy: trackByCity"
-      (click)="selectCity(city)"
-      class="city-item"
-      [class.selected]="selectedCity?.name === city.name"
-      [class.major-city]="isMajorCity(city)"
-    >
-      <div class="city-info">
-        <span class="city-name">{{ city.name }}</span>
-        <span class="city-timezone">{{ getCityCountry(city.timezone) }}</span>
-      </div>
-
-      <div class="city-actions">
-        <span class="city-flag">{{ getCityFlag(city.name) }}</span>
-        <button
-          *ngIf="!isMajorCity(city)"
-          (click)="removeCityFromSidebar(city); $event.stopPropagation()"
-          class="remove-button"
-        >
-          ✕
-        </button>
-      </div>
+  <!-- City Cards -->
+  <div class="city-cards">
+    <div class="city-list">
+      <app-city-card
+        *ngFor="let city of displayedCities; trackBy: trackByCity"
+        [city]="city"
+        [isSelected]="selectedCity?.name === city.name"
+        [isMajorCity]="isMajorCity(city)"
+        [showRemoveButton]="!isMajorCity(city)"
+        (cityClick)="selectCity($event)"
+        (removeClick)="removeCityFromSidebar($event)"
+      >
+      </app-city-card>
     </div>
-  </div>
 
-  <!-- Empty State -->
-  <div *ngIf="displayedCities.length === 0" class="empty-state">
-    <p>🔍 Search for cities to add them here</p>
+    <!-- Empty State -->
+    <div *ngIf="displayedCities.length === 0" class="empty-state">
+      <p>🔍 Search for cities to add them here</p>
+    </div>
   </div>
 </div>

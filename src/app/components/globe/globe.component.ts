@@ -4,11 +4,12 @@ import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { City } from '../../models/city.model';
+import { CityDetailsComponent } from '../city-details/city-details.component';
 
 @Component({
   selector: 'app-globe',
   standalone: true,
-  imports: [],
+  imports: [CityDetailsComponent],
   templateUrl: './globe.component.html',
   styleUrl: './globe.component.css'
 })
@@ -23,6 +24,11 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
   private chart!: am5map.MapChart;
   private pointSeries!: am5map.MapPointSeries;
   private allCitiesPointSeries!: am5map.MapPointSeries;
+
+  // Tooltip properties
+  hoveredCity: City | null = null;
+  tooltipPosition = { x: 0, y: 0 };
+  showTooltip = false;
 
   constructor(private zone: NgZone) {}
 
@@ -98,8 +104,30 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
           })
         });
 
-        // Set tooltip with THIS city's name
-        bullet.get("sprite")!.set("tooltipText", cityData.name);
+        // Add hover events for custom tooltip
+        bullet.get("sprite")!.events.on("pointerover", (ev) => {
+          const city = this.displayedCities.find(c => c.name === cityData.name);
+          if (city) {
+            this.zone.run(() => {
+              this.hoveredCity = city;
+              this.showTooltip = true;
+              
+              // Get mouse position
+              const event = ev.originalEvent as MouseEvent;
+              this.tooltipPosition = {
+                x: event.clientX + 10,
+                y: event.clientY - 10
+              };
+            });
+          }
+        });
+
+        bullet.get("sprite")!.events.on("pointerout", () => {
+          this.zone.run(() => {
+            this.showTooltip = false;
+            this.hoveredCity = null;
+          });
+        });
 
         // Add click event with THIS city's data
         bullet.get("sprite")!.events.on("click", () => {
@@ -168,73 +196,57 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   private rotateToCity() {
-  if (!this.chart || !this.selectedCityId) return;
+    if (!this.chart || !this.selectedCityId) return;
 
-  const currentX = this.chart.get("rotationX") || 0;
-  const currentY = this.chart.get("rotationY") || 0;
-  
-  const targetX = -this.lon;
-  const targetY = -this.lat;
+    const currentX = this.chart.get("rotationX") || 0;
+    const currentY = this.chart.get("rotationY") || 0;
+    
+    const targetX = -this.lon;
+    const targetY = -this.lat;
 
-  // Helper function for shortest rotation path with proper wrapping
-  const getShortestPath = (from: number, to: number): number => {
-    // Normalize both angles to -180 to 180 range for comparison
-    const normalizeAngle = (angle: number) => {
-      return ((angle + 180) % 360) - 180;
+    // Helper function for shortest rotation path with proper wrapping
+    const getShortestPath = (from: number, to: number): number => {
+      // Normalize both angles to -180 to 180 range for comparison
+      const normalizeAngle = (angle: number) => {
+        return ((angle + 180) % 360) - 180;
+      };
+      
+      const normalizedFrom = normalizeAngle(from);
+      const normalizedTo = normalizeAngle(to);
+      
+      // Calculate the shortest difference
+      let diff = normalizedTo - normalizedFrom;
+      
+      // Ensure we take the shortest path
+      if (diff > 180) {
+        diff -= 360;
+      } else if (diff < -180) {
+        diff += 360;
+      }
+      
+      // Apply the difference to the original 'from' value
+      return from + diff;
     };
-    
-    const normalizedFrom = normalizeAngle(from);
-    const normalizedTo = normalizeAngle(to);
-    
-    // Calculate the shortest difference
-    let diff = normalizedTo - normalizedFrom;
-    
-    // Ensure we take the shortest path
-    if (diff > 180) {
-      diff -= 360;
-    } else if (diff < -180) {
-      diff += 360;
-    }
-    
-    // Apply the difference to the original 'from' value
-    return from + diff;
-  };
 
-  const finalX = getShortestPath(currentX, targetX);
-  const finalY = getShortestPath(currentY, targetY);
+    const finalX = getShortestPath(currentX, targetX);
+    const finalY = getShortestPath(currentY, targetY);
 
-  this.chart.animate({
-    key: "rotationX",
-    to: finalX,
-    duration: 1000,
-    easing: am5.ease.out(am5.ease.cubic)
-  });
+    this.chart.animate({
+      key: "rotationX",
+      to: finalX,
+      duration: 1000,
+      easing: am5.ease.out(am5.ease.cubic)
+    });
 
-  this.chart.animate({
-    key: "rotationY",
-    to: finalY,
-    duration: 1000,
-    easing: am5.ease.out(am5.ease.cubic)
-  });
-}
+    this.chart.animate({
+      key: "rotationY",
+      to: finalY,
+      duration: 1000,
+      easing: am5.ease.out(am5.ease.cubic)
+    });
+  }
 
   ngOnDestroy() {
     this.root?.dispose();
-  }
-
-  getCurrentGlobePosition(): { lat: number, lon: number } {
-    if (!this.chart) {
-      return { lat: 0, lon: 0 };
-    }
-
-    // Get current rotation from the chart
-    const currentRotationX = this.chart.get("rotationX") || 0;
-    const currentRotationY = this.chart.get("rotationY") || 0;
-
-    // Convert rotation back to coordinates (inverse of what we do in rotateToCity)
-    const currentLon = -currentRotationX;
-    const currentLat = -currentRotationY;
-
-    return { lat: currentLat, lon: currentLon };
   }
 }

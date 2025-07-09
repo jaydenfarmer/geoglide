@@ -1,0 +1,27 @@
+<div
+  class="city-card"
+  [class.selected]="isSelected"
+  [class.major-city]="isMajorCity"
+  (click)="onCityClick()"
+>
+  <div class="card-header">
+    <div class="city-main-info">
+      <div class="city-text">
+        <span class="city-name">{{ city.name }}</span>
+        <span class="city-country">{{ getCityCountry(city.timezone) }}</span>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <span class="current-time">{{ currentTime }}</span>
+      <button
+        *ngIf="showRemoveButton && !isMajorCity"
+        (click)="onRemoveClick($event)"
+        class="remove-button"
+        title="Remove city"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+</div>

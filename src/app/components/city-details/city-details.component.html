@@ -1,0 +1,20 @@
+<div 
+  class="city-details-tooltip" 
+  [class.visible]="visible && city"
+  [style.left.px]="position.x"
+  [style.top.px]="position.y"
+  *ngIf="city">
+  
+  <div class="city-info">
+    <h3 class="city-name">{{ city.name }}</h3>
+    
+    <div class="time-section">
+      <div class="time-value">{{ currentTime }}</div>
+      <div class="date-value">{{ currentDate }}</div>
+    </div>
+    
+    <div class="coordinates">
+      <small>{{ city.lat | number:'1.4-4' }}°, {{ city.lng | number:'1.4-4' }}°</small>
+    </div>
+  </div>
+</div>
