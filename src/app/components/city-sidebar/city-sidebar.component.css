@@ -55,6 +55,7 @@
   font-size: 1rem;
   outline: none;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -118,6 +119,16 @@
   border-bottom: none;
 }
 
+.city-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.city-timezone {
+  font-size: 0.875rem;
+  color: #666;
+}
+
 .add-button {
   background: rgba(74, 144, 226, 0.3);
   border: none;
@@ -136,80 +147,15 @@
 }
 
 .city-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal scrolling during animation */
 }
 
-.city-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.city-item:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.city-item.selected {
-  border-color: rgba(74, 144, 226, 0.6);
-  background: rgba(74, 144, 226, 0.2);
-}
-
-.city-item.major-city {
-  border-left: 4px solid rgba(74, 144, 226, 0.8);
-}
-
-.city-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.city-name {
-  font-weight: 600;
-  color: #333;
-  font-size: 1rem;
-}
-
-.city-timezone {
-  font-size: 0.875rem;
-  color: #666;
-}
-
-.city-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.city-flag {
-  font-size: 1.25rem;
-}
-
-.remove-button {
-  background: rgba(231, 76, 60, 0.3);
-  border: none;
-  color: #e74c3c;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
-}
-
-.remove-button:hover {
-  background: rgba(231, 76, 60, 0.5);
-  transform: scale(1.1);
+.city-card-wrapper {
+  /* This wrapper ensures proper animation boundaries */
+  overflow: hidden;
+  width: 100%;
 }
 
 .empty-state {

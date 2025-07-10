@@ -33,11 +33,14 @@
     </div>
   </div>
 
-  <!-- City Cards -->
-  <div class="city-cards">
-    <div class="city-list">
+  <!-- City Cards with Animation -->
+  <div class="city-list" [@listAnimation]="displayedCities.length">
+    <div
+      *ngFor="let city of displayedCities; trackBy: trackByCity"
+      [@slideInOut]
+      class="city-card-wrapper"
+    >
       <app-city-card
-        *ngFor="let city of displayedCities; trackBy: trackByCity"
         [city]="city"
         [isSelected]="selectedCity?.name === city.name"
         [isMajorCity]="isMajorCity(city)"
