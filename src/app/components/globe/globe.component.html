@@ -2,7 +2,9 @@
 
 <app-city-details
   [city]="hoveredCity"
-  [position]="tooltipPosition"
+  [position]="draggableTooltipPosition"
   [visible]="showTooltip"
+  (close)="onTooltipClose()"
+  (positionChange)="onTooltipPositionChange($event)"
 >
 </app-city-details>

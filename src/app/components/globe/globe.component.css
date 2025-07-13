@@ -1,9 +1,3 @@
-#globeDiv {
-  width: 100%;
-  height: 500px;
-  overflow: hidden;
-}
-
 /* Globe container styling */
 /* .globe-container {
   position: relative;
@@ -35,3 +29,9 @@
     border-radius: 10px;
   }
 } */
+
+#globeDiv {
+  width: 100%;
+  height: 700px;
+  position: relative;
+}

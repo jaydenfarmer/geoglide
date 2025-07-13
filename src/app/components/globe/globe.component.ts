@@ -15,11 +15,12 @@ import am5geodata_worldLow from '@amcharts/amcharts5-geodata/worldLow';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import { City } from '../../models/city.model';
 import { CityDetailsComponent } from '../city-details/city-details.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-globe',
   standalone: true,
-  imports: [CityDetailsComponent],
+  imports: [CityDetailsComponent, CommonModule],
   templateUrl: './globe.component.html',
   styleUrl: './globe.component.css',
 })
@@ -37,8 +38,13 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
 
   // Tooltip properties
   hoveredCity: City | null = null;
+  selectedCity: City | null = null;
   tooltipPosition = { x: 0, y: 0 };
   showTooltip = false;
+  showCityName = false;
+  cityNamePosition = { x: 0, y: 0 };
+  private lastTooltipPosition = { x: window.innerWidth / 2 + 40, y: 50 };
+  draggableTooltipPosition = { x: 0, y: 0 };
 
   constructor(private zone: NgZone) {}
 
@@ -105,56 +111,28 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
 
       // Style the small city pins
       this.allCitiesPointSeries.bullets.push((root, series, dataItem) => {
-        // Get the specific city data for THIS bullet
         const cityData = dataItem.dataContext as any;
-
         const isSelected = this.selectedCityId === cityData.name;
 
         const bullet = am5.Bullet.new(this.root, {
           sprite: am5.Circle.new(this.root, {
-            radius: 4,
+            radius: isSelected ? 6 : 4,
             fill: am5.color(isSelected ? 0xe74c3c : 0x00098e),
             stroke: am5.color(0xffffff),
-            strokeWidth: 1,
+            strokeWidth: isSelected ? 2 : 1,
             cursorOverStyle: 'pointer',
           }),
         });
 
-        // Add hover events for custom tooltip
-        bullet.get('sprite')!.events.on('pointerover', (ev) => {
-          const city = this.displayedCities.find(
-            (c) => c.name === cityData.name
-          );
-          if (city) {
-            this.zone.run(() => {
-              this.hoveredCity = city;
-              this.showTooltip = true;
+        // Set tooltip with THIS city's name
+        bullet.get('sprite')!.set('tooltipText', cityData.name);
 
-              // Get mouse position
-              const event = ev.originalEvent as MouseEvent;
-              this.tooltipPosition = {
-                x: event.clientX + 10,
-                y: event.clientY - 10,
-              };
-            });
-          }
-        });
-
-        bullet.get('sprite')!.events.on('pointerout', () => {
-          this.zone.run(() => {
-            this.showTooltip = false;
-            this.hoveredCity = null;
-          });
-        });
-
-        // Add click event with THIS city's data
+        // Remove hover events, only keep click
         bullet.get('sprite')!.events.on('click', () => {
-          // Find the city object by name
           const city = this.displayedCities.find(
             (c) => c.name === cityData.name
           );
           if (city) {
-            // Emit the event (this will update selectedCityId)
             this.citySelected.emit(city);
           }
         });
@@ -188,12 +166,54 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
     // Update selection state when selectedCityId changes
     if (changes['selectedCityId'] && this.chart) {
       this.updateCityPins(); // Refresh pins to show new selection state
+
+      // Show tooltip for selected city
+      if (this.selectedCityId) {
+        this.selectedCity =
+          this.displayedCities.find((c) => c.name === this.selectedCityId) ||
+          null;
+        // In ngOnChanges, set initial draggable position
+        if (this.selectedCity) {
+          this.hoveredCity = this.selectedCity;
+          this.showTooltip = true;
+          this.draggableTooltipPosition = { ...this.lastTooltipPosition };
+        }
+      } else {
+        this.selectedCity = null;
+        this.showTooltip = false;
+        this.hoveredCity = null;
+      }
     }
 
     // Rotate to city when lat/lon changes
     if ((changes['lat'] || changes['lon']) && this.chart) {
       this.rotateToCity();
     }
+  }
+
+  // Add these methods to handle city name hover
+  onCityNameHover(event: MouseEvent) {
+    if (this.selectedCity) {
+      this.hoveredCity = this.selectedCity;
+      this.showTooltip = true;
+    }
+  }
+
+  // Update the tooltip position handler
+  onTooltipPositionChange(newPosition: { x: number; y: number }) {
+    this.draggableTooltipPosition = newPosition;
+    this.lastTooltipPosition = { ...newPosition }; // Remember this position
+  }
+
+  onCityNameLeave() {
+    this.showTooltip = false;
+    this.hoveredCity = null;
+  }
+
+  // Keep existing onTooltipClose method
+  onTooltipClose() {
+    this.showTooltip = false;
+    this.hoveredCity = null;
   }
 
   // New method to update pins based on displayed cities

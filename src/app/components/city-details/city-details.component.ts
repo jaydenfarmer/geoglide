@@ -1,4 +1,14 @@
-import { Component, Input, OnInit, OnDestroy, OnChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  OnChanges,
+  Output,
+  EventEmitter,
+  ElementRef,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { City } from '../../models/city.model';
 
@@ -7,23 +17,60 @@ import { City } from '../../models/city.model';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './city-details.component.html',
-  styleUrls: ['./city-details.component.css']
+  styleUrls: ['./city-details.component.css'],
 })
 export class CityDetailsComponent implements OnInit, OnDestroy, OnChanges {
   @Input() city: City | null = null;
-  @Input() position: { x: number, y: number } = { x: 0, y: 0 };
+  @Input() position: { x: number; y: number } = { x: 0, y: 0 };
   @Input() visible: boolean = false;
+  @Output() close = new EventEmitter<void>();
+  @Output() positionChange = new EventEmitter<{ x: number; y: number }>();
+
+  @ViewChild('tooltip', { static: false }) tooltipRef!: ElementRef;
+
+  private isDragging = false;
+  private dragOffset = { x: 0, y: 0 };
 
   currentTime: string = '';
   currentDate: string = '';
   private timeInterval: any;
 
-  ngOnInit() {
-    this.startTimeUpdates();
+  onMouseDown(event: MouseEvent) {
+    this.isDragging = true;
+    this.dragOffset = {
+      x: event.clientX - this.position.x,
+      y: event.clientY - this.position.y,
+    };
+
+    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseup', this.onMouseUp);
+    event.preventDefault();
   }
 
+  onMouseMove = (event: MouseEvent) => {
+    if (this.isDragging) {
+      const newPosition = {
+        x: event.clientX - this.dragOffset.x,
+        y: event.clientY - this.dragOffset.y,
+      };
+      this.positionChange.emit(newPosition);
+    }
+  };
+
+  onMouseUp = () => {
+    this.isDragging = false;
+    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.onMouseUp);
+  };
+
   ngOnDestroy() {
+    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.onMouseUp);
     this.stopTimeUpdates();
+  }
+
+  ngOnInit() {
+    this.startTimeUpdates();
   }
 
   ngOnChanges() {
@@ -47,17 +94,17 @@ export class CityDetailsComponent implements OnInit, OnDestroy, OnChanges {
 
   private updateTime() {
     if (!this.city) return;
-    
+
     try {
       const now = new Date();
-      
+
       // Format time
       const timeFormatter = new Intl.DateTimeFormat('en-US', {
         timeZone: this.city.timezone,
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        hour12: true
+        hour12: true,
       });
       this.currentTime = timeFormatter.format(now);
 
@@ -67,10 +114,9 @@ export class CityDetailsComponent implements OnInit, OnDestroy, OnChanges {
         weekday: 'short',
         month: 'short',
         day: 'numeric',
-        year: 'numeric'
+        year: 'numeric',
       });
       this.currentDate = dateFormatter.format(now);
-      
     } catch (error) {
       this.currentTime = 'Time unavailable';
       this.currentDate = '';
