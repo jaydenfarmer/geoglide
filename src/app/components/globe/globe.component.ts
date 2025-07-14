@@ -49,7 +49,22 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
   constructor(private zone: NgZone) {}
 
   ngAfterViewInit() {
-    this.zone.runOutsideAngular(() => {
+    this.zone.runOutsideAngular(async () => {
+      // Lazy load amCharts modules with proper typing
+      const [am5Module, am5mapModule, worldLowModule, animatedThemeModule] =
+        await Promise.all([
+          import('@amcharts/amcharts5'),
+          import('@amcharts/amcharts5/map'),
+          import('@amcharts/amcharts5-geodata/worldLow'),
+          import('@amcharts/amcharts5/themes/Animated'),
+        ]);
+
+      // Extract the actual exports
+      const am5 = am5Module;
+      const am5map = am5mapModule;
+      const am5geodata_worldLow = worldLowModule.default;
+      const am5themes_Animated = animatedThemeModule.default;
+
       // Create root
       this.root = am5.Root.new('globeDiv');
 
@@ -68,10 +83,11 @@ export class GlobeComponent implements AfterViewInit, OnDestroy, OnChanges {
       // Create main polygon series for countries
       var polygonSeries = this.chart.series.push(
         am5map.MapPolygonSeries.new(this.root, {
-          geoJSON: am5geodata_worldLow,
+          geoJSON: am5geodata_worldLow, // Now properly typed
         })
       );
 
+      // Rest of your existing code...
       polygonSeries.mapPolygons.template.setAll({
         tooltipText: '{name}',
         toggleKey: 'active',
