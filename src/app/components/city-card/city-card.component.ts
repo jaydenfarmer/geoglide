@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { City } from '../../models/city.model';
 import { TimezoneService } from '../../services/timezone.service';
+import { TIMEZONE_OFFSET } from '../../models/timezone-full-map';
 
 @Component({
   selector: 'app-city-card',
@@ -49,6 +50,20 @@ export class CityCardComponent implements OnInit, OnDestroy {
 
   getCityCountry(timezone: string): string {
     return this.timezoneService.getCountryFromTimezone(timezone);
+  }
+
+  getTimezoneOffset(): string {
+    if (!this.city) {
+      return '';
+    }
+    const offset = TIMEZONE_OFFSET[this.city.timezone];
+    if (offset > 0) {
+      return `+${offset}`;
+    } else if (offset < 0) {
+      return `${offset}`;
+    } else {
+      return '';
+    }
   }
 
   private startTimeUpdates() {

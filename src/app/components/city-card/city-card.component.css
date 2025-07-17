@@ -70,6 +70,12 @@
   gap: 8px;
 }
 
+.current-time-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .current-time {
   font-size: 12px;
   font-weight: 600;

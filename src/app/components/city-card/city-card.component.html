@@ -13,7 +13,10 @@
     </div>
 
     <div class="card-actions">
-      <span class="current-time">{{ currentTime }}</span>
+      <div class="current-time-block">
+        <span class="current-time">{{ currentTime }}</span>
+        <span class="current-time">UTC{{ getTimezoneOffset() }}</span>
+      </div>
       <button
         *ngIf="showRemoveButton && !isMajorCity"
         (click)="onRemoveClick($event)"
