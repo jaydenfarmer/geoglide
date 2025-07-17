@@ -1,4 +1,13 @@
+<button
+  class="sidebar-toggle"
+  (click)="sidebarOpen = !sidebarOpen"
+  *ngIf="isMobile"
+>
+  &#9776;
+</button>
+
 <app-city-sidebar
+  *ngIf="!isMobile || sidebarOpen"
   [selectedCity]="selectedCity"
   (citySelected)="onCitySelected($event)"
   (displayedCitiesChanged)="onDisplayedCitiesChanged($event)"
@@ -7,7 +16,7 @@
 
 <div class="main-content">
   <div class="app-header">
-    <h2 class="app-title">🌍 GeoGlide</h2>
+    <h2 class="app-title">GeoGlide</h2>
     @if (selectedCity) {
     <div class="selected-city-info">
       <span class="selected-city">{{ selectedCity.name }}</span>

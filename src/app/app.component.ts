@@ -16,8 +16,20 @@ import { TimezoneService } from '../app/services/timezone.service';
 export class AppComponent {
   selectedCity: City | null = null;
   displayedCities: City[] = [];
+  isMobile = false;
+  sidebarOpen = false;
 
   constructor(private timezoneService: TimezoneService) {}
+
+  ngOnInit() {
+    this.checkMobile();
+    window.addEventListener('resize', () => this.checkMobile());
+  }
+
+  checkMobile() {
+    this.isMobile = window.innerWidth <= 768;
+    if (!this.isMobile) this.sidebarOpen = false;
+  }
 
   onCitySelected(city: City) {
     this.selectedCity = city;

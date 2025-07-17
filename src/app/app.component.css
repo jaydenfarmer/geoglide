@@ -42,6 +42,16 @@
   min-height: 100vh;
 }
 
+.sidebar-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1100;
+  background: none;
+  border: none;
+  font-size: 2rem;
+}
+
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;
@@ -55,5 +65,16 @@
 
   .selected-city-info {
     align-items: center;
+  }
+
+  app-city-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 80vw;
+    max-width: 300px;
+    height: 100vh;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
   }
 }
