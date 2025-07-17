@@ -13,6 +13,7 @@
   <div class="details-content">
     <p><strong>Local Time:</strong> {{ currentTime }}</p>
     <p><strong>Date:</strong> {{ currentDate }}</p>
-    <p><strong>Timezone:</strong> {{ city.timezone }}</p>
+    <p><strong>Timezone:</strong> {{ getTimezoneFullName() }}</p>
+    <p><strong>UTC offset:</strong> {{ getTimezoneOffset() }}</p>
   </div>
 </div>

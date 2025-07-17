@@ -1,19 +1,35 @@
 .city-details {
   position: fixed;
-  background: rgba(0, 0, 0, 0.097);
-  color: rgb(0, 0, 0);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: var(--bg-dark, rgba(0, 0, 0, 0.92));
+  color: var(--text-light, #fff);
+  border-radius: var(--border-radius, 12px);
+  box-shadow: var(--shadow, 0 8px 32px rgba(0, 0, 0, 0.25));
   z-index: 9999;
-  max-width: 220px;
-  backdrop-filter: blur(10px);
-  user-select: none; /* Prevent text selection while dragging */
+  max-width: 270px;
+  min-width: 220px;
+  min-height: 120px;
+  backdrop-filter: blur(12px);
+  user-select: none;
   cursor: move;
+  overflow: hidden;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  transition: box-shadow 0.2s, border 0.2s;
+  padding: 0;
+}
+
+.city-details:hover {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.32);
+  border: 1.5px solid var(--accent-color, #e74c3c);
 }
 
 .drag-handle {
-  padding: 10px 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 14px 20px 10px 20px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-color, #00098e) 60%,
+    var(--accent-color, #e74c3c) 100%
+  );
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -24,22 +40,51 @@
   cursor: grabbing;
 }
 
+.drag-handle h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
 .details-content {
-  padding: 15px;
+  padding: 18px 20px 14px 20px;
   cursor: default;
+  background: transparent;
+}
+
+.details-content p {
+  margin: 8px 0;
+  font-size: 1rem;
+  color: var(--text-light, #fff);
+  opacity: 0.95;
+  line-height: 1.4;
+}
+
+.details-content strong {
+  color: var(--accent-color, #e74c3c);
+  font-weight: 600;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: white;
-  font-size: 18px;
+  color: #fff;
+  font-size: 1.3rem;
   cursor: pointer;
-  padding: 0;
-  width: 20px;
-  height: 20px;
+  padding: 0 0 0 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  transition: background 0.18s, color 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-btn:hover {
-  color: #ff6b6b;
+  background: var(--accent-color, #e74c3c);
+  color: #fff;
 }

@@ -11,6 +11,10 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { City } from '../../models/city.model';
+import {
+  TIMEZONE_FULLNAME,
+  TIMEZONE_OFFSET,
+} from '../../models/timezone-full-map';
 
 @Component({
   selector: 'app-city-details',
@@ -76,6 +80,27 @@ export class CityDetailsComponent implements OnInit, OnDestroy, OnChanges {
   ngOnChanges() {
     if (this.city) {
       this.updateTime();
+    }
+  }
+
+  getTimezoneFullName(): string {
+    if (!this.city) {
+      return '';
+    }
+    return TIMEZONE_FULLNAME[this.city.timezone] || this.city.timezone;
+  }
+
+  getTimezoneOffset(): string {
+    if (!this.city) {
+      return '';
+    }
+    const offset = TIMEZONE_OFFSET[this.city.timezone];
+    if (offset > 0) {
+      return `+${offset}`;
+    } else if (offset < 0) {
+      return `${offset}`;
+    } else {
+      return '0';
     }
   }
 
