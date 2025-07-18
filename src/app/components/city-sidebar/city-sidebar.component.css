@@ -10,6 +10,9 @@
   left: 0;
   top: 0;
   z-index: 1000;
+  /* Remove any transform or opacity here! */
+  will-change: transform, opacity;
+  transition: none;
 }
 
 .sidebar-header {

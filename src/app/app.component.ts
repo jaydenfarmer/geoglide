@@ -1,4 +1,11 @@
-import { Component, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition,
+} from '@angular/animations';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { City } from './models/city.model';
@@ -12,6 +19,30 @@ import { TimezoneService } from '../app/services/timezone.service';
   imports: [RouterOutlet, CommonModule, GlobeComponent, CitySidebarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
+  animations: [
+    trigger('sidebarSlide', [
+      state(
+        'open',
+        style({
+          transform: 'translateX(0)',
+          opacity: 1,
+        })
+      ),
+      state(
+        'closed',
+        style({
+          transform: 'translateX(-100%)',
+          opacity: 0,
+        })
+      ),
+      transition('closed => open', [
+        animate('300ms cubic-bezier(0.4,0,0.2,1)'),
+      ]),
+      transition('open => closed', [
+        animate('200ms cubic-bezier(0.4,0,0.2,1)'),
+      ]),
+    ]),
+  ],
 })
 export class AppComponent {
   selectedCity: City | null = null;
@@ -19,11 +50,15 @@ export class AppComponent {
   isMobile = false;
   sidebarOpen = false;
 
-  constructor(private timezoneService: TimezoneService) {}
+  constructor(
+    private timezoneService: TimezoneService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  ngOnInit() {
+  ngAfterViewInit() {
     this.checkMobile();
     window.addEventListener('resize', () => this.checkMobile());
+    this.cdr.detectChanges();
   }
 
   checkMobile() {

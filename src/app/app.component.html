@@ -7,8 +7,8 @@
 </button>
 
 <app-city-sidebar
-  *ngIf="!isMobile || sidebarOpen"
   [selectedCity]="selectedCity"
+  [@sidebarSlide]="!isMobile ? 'open' : sidebarOpen ? 'open' : 'closed'"
   (citySelected)="onCitySelected($event)"
   (displayedCitiesChanged)="onDisplayedCitiesChanged($event)"
 >
