@@ -133,11 +133,8 @@ export class CitySidebarComponent implements OnInit {
   }
 
   removeCityFromSidebar(city: City) {
-    console.log('Removing city:', city);
-
     // Don't allow removing major cities
     if (this.isMajorCity(city)) {
-      console.log('Cannot remove major city:', city.name);
       return;
     }
 
@@ -145,8 +142,6 @@ export class CitySidebarComponent implements OnInit {
     this.displayedCities = this.displayedCities.filter(
       (c) => c.name !== city.name
     );
-
-    console.log('Cities after removal:', this.displayedCities);
 
     // Emit the updated list
     this.displayedCitiesChanged.emit(this.displayedCities);
