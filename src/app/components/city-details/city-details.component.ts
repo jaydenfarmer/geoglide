@@ -15,11 +15,12 @@ import {
   TIMEZONE_FULLNAME,
   TIMEZONE_OFFSET,
 } from '../../models/timezone-full-map';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-city-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DragDropModule],
   templateUrl: './city-details.component.html',
   styleUrls: ['./city-details.component.css'],
 })
