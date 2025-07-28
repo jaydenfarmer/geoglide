@@ -33,44 +33,11 @@ export class CityDetailsComponent implements OnInit, OnDestroy, OnChanges {
 
   @ViewChild('tooltip', { static: false }) tooltipRef!: ElementRef;
 
-  private isDragging = false;
-  private dragOffset = { x: 0, y: 0 };
-
   currentTime: string = '';
   currentDate: string = '';
   private timeInterval: any;
 
-  onMouseDown(event: MouseEvent) {
-    this.isDragging = true;
-    this.dragOffset = {
-      x: event.clientX - this.position.x,
-      y: event.clientY - this.position.y,
-    };
-
-    document.addEventListener('mousemove', this.onMouseMove);
-    document.addEventListener('mouseup', this.onMouseUp);
-    event.preventDefault();
-  }
-
-  onMouseMove = (event: MouseEvent) => {
-    if (this.isDragging) {
-      const newPosition = {
-        x: event.clientX - this.dragOffset.x,
-        y: event.clientY - this.dragOffset.y,
-      };
-      this.positionChange.emit(newPosition);
-    }
-  };
-
-  onMouseUp = () => {
-    this.isDragging = false;
-    document.removeEventListener('mousemove', this.onMouseMove);
-    document.removeEventListener('mouseup', this.onMouseUp);
-  };
-
   ngOnDestroy() {
-    document.removeEventListener('mousemove', this.onMouseMove);
-    document.removeEventListener('mouseup', this.onMouseUp);
     this.stopTimeUpdates();
   }
 
