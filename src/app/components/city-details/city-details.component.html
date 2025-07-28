@@ -1,12 +1,4 @@
-<div
-  #tooltip
-  *ngIf="visible && city"
-  class="city-details"
-  cdkDrag
-  [style.left.px]="position.x"
-  [style.top.px]="position.y"
-  (mousedown)="onMouseDown($event)"
->
+<div #tooltip *ngIf="visible && city" class="city-details" cdkDrag>
   <div class="drag-handle">
     <h3>{{ city.name }}</h3>
   </div>
