@@ -1,27 +1,75 @@
-# Geoglide
+# GeoGlide
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.0.
+GeoGlide is an interactive Angular web application for visualizing world cities and their time zones. Users can search, add, and manage cities in a sidebar, view real-time local times, and explore locations on a 3D globe. The app features smooth sidebar animations, responsive mobile support, and a modern, visually appealing UI.
 
-## Development server
+## Features
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- **Animated Sidebar:** Add, remove, and select cities with smooth transitions.
+- **City Search:** Quickly find and add cities to your list.
+- **Real-Time Clocks:** See the current time, date, and UTC offset for each city.
+- **3D Globe Visualization:** Explore cities on an interactive globe.
+- **Responsive Design:** Sidebar collapses to a hamburger menu on mobile.
+- **Drag & Drop:** Move city details and reorder city cards (using Angular CDK).
+- **Modern UI:** Uses Angular standalone components and CSS effects like blur.
 
-## Code scaffolding
+## Screenshots
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+![GeoGlide Screenshot](public/geoglide-screenshot.png)
 
-## Build
+## Getting Started
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Prerequisites
 
-## Running unit tests
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- [Angular CLI](https://angular.io/cli) (v18)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Installation
 
-## Running end-to-end tests
+1. Clone the repository:
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+   ```sh
+   git clone https://github.com/jaydenfarmer/geoglide.git
+   cd geoglide
+   ```
 
-## Further help
+2. Install dependencies:
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+   ```sh
+   npm install
+   ```
+
+3. Run the development server:
+   ```sh
+   ng serve
+   ```
+   Then open [http://localhost:4200](http://localhost:4200) in your browser.
+
+## Usage
+
+- Use the sidebar to search for and add cities.
+- Click a city to view its details and see its location on the globe.
+- On mobile, open the sidebar with the hamburger menu.
+- Drag city cards or the city details popup to reposition them.
+
+## Project Structure
+
+- `src/app/app.component.*` - Main app shell and layout
+- `src/app/components/city-sidebar/` - Sidebar for managing cities
+- `src/app/components/city-card/` - Individual city cards
+- `src/app/components/city-details/` - Draggable city details popup
+- `src/app/components/globe/` - 3D globe visualization
+
+## Technical Highlights
+
+- Angular standalone components
+- Angular Animations for smooth UI transitions
+- Angular CDK DragDrop for drag-and-drop features
+- Responsive CSS and modern UI design
+
+## License
+
+MIT
+
+---
+
+**GeoGlide** was built as a portfolio project to demonstrate modern Angular techniques, responsive design, and interactive data visualization.
